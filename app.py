@@ -15,10 +15,13 @@ def call_monkey():
 def drink_with_monkey():
     global alcohol_percentage
     global times_slapped
-    alcohol_percentage += 0.25
-    if times_slapped > 0:
-        times_slapped -= 1
-    return jsonify({'message': 'Jay drank some beer with you!'})
+    if is_monkey_dead():
+        return jsonify({'message': 'Dead monkeys don\'t drink...'})
+    else:
+        alcohol_percentage += 0.25
+        if times_slapped > 0:
+            times_slapped -= 1
+        return jsonify({'message': 'Jay drank some beer with you!'})
 
 
 @app.route('/slap')
@@ -26,9 +29,12 @@ def slap_the_monkey():
     global times_slapped
     global alcohol_percentage
     times_slapped += 1
-    if alcohol_percentage > 0:
-        alcohol_percentage -= 0.125
-    return jsonify({'message': 'You slapped the monkey!'})
+    if is_monkey_dead():
+        return jsonify({'message': 'You slapped the dead monkey!'})
+    else:
+        if alcohol_percentage > 0:
+            alcohol_percentage -= 0.125
+        return jsonify({'message': 'You slapped the monkey!'})
 
 
 def create_monkey_card():
@@ -40,8 +46,12 @@ def create_monkey_card():
     }
 
 
+def is_monkey_dead():
+    return alcohol_percentage > 5.0 or times_slapped >= 100
+
+
 def define_monkey_state():
-    if alcohol_percentage > 5.0 or times_slapped >= 100:
+    if is_monkey_dead():
         return 'is dead.'
     if 0 <= alcohol_percentage < 0.5:
         return 'is.... being Jay the monkey.'
@@ -56,4 +66,4 @@ def define_monkey_state():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0')
